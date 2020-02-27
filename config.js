@@ -497,7 +497,7 @@ module.exports = {
         },
         {
           name: '申告先コード',
-          default: '0001',
+          default: '00001',
         },
         {
           name: '前年度申告時帳簿価額',
