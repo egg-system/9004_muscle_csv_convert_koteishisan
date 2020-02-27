@@ -127,7 +127,6 @@ module.exports = {
         },
         {
           name: '種類コード',
-          default: '000000',
           from: '資産種類コード',
           convert: (fromValue) => {
             switch (fromValue) {
@@ -207,7 +206,6 @@ module.exports = {
         },
         {
           name: '圧縮区分',
-          default: '0',
           from: '圧縮損計上',
           convert: (fromValue) => {
             var value = 0
@@ -399,7 +397,6 @@ module.exports = {
         },
         {
           name: '取得日',
-          default: '',
           from: '取得年月日',
           convert: (fromValue) => {
             return convertDateFormat(fromValue)
