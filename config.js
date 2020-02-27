@@ -100,7 +100,6 @@ module.exports = {
       columns: [
         {
           name: '資産番号',
-          default: '',
           from: '固定資産コード',
         },
         {
@@ -109,7 +108,6 @@ module.exports = {
         },
         {
           name: '資産名称',
-          default: '',
           from: '名称',
         },
         {
