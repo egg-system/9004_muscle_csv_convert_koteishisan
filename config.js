@@ -44,7 +44,7 @@ module.exports = {
       '償却累計額': (columnValue) => {
         return columnValue
       },
-      '償却方法コード名': (columnValue) => {
+      '償却方法コード': (columnValue) => {
         return columnValue
       },
       '耐用年数': (columnValue) => {
@@ -106,23 +106,19 @@ module.exports = {
     outputs: {
       // 出力CSVのカラムを配列で設定する
       columns: [{
-          name: '資産番号',
-          default: '',
-          from: '固定資産コード',
-          convert: (fromValue) => {
-            return fromValue
-          }
-        },
+        name: '資産番号',
+        default: '',
+        from: '固定資産コード',
+        convert: (fromValue) => {
+          return fromValue
+        }
+      },
         {
           name: '修正区分',
           default: '0',
           from: '資産種類コード',
           convert: (fromValue) => {
-            var value = 0
-            if (fromValue == 18 || fromValue == 42) {
-              value = 4
-            }
-            return value
+            return '0'
           }
         },
         {
@@ -162,7 +158,7 @@ module.exports = {
           default: '',
           from: '',
           convert: (fromValue) => {
-            return fromValue
+            return '0'
           }
         },
         {
@@ -170,21 +166,26 @@ module.exports = {
           default: '000000',
           from: '資産種類コード',
           convert: (fromValue) => {
-            var value = 000000
-            if (fromValue == 1) {
-              value = 000500
-            } else if (fromValue == 4) {
-              value = 000100
-            } else if (fromValue == 12) {
-              value = 000003
-            } else if (fromValue == 18) {
-              value = 000005
-            } else if (fromValue == 33 || fromValue == 36 || fromValue == 39) {
-              value = 000101
-            } else if (fromValue == 42) {
-              value = 000110
+            switch (fromValue) {
+              case '1':
+                return '000500'
+              case '4':
+                return '000903'
+              case '12':
+                return '000001'
+              case '18':
+                return '000005'
+              case '33':
+                return '000901'
+              case '36':
+                return '000902'
+              case '39':
+                return '000101'
+              case '42':
+                return '000110'
+              default:
+                return ''
             }
-            return value
           }
         },
         {
@@ -378,17 +379,17 @@ module.exports = {
         {
           name: '当期償却方法',
           default: '',
-          from: '償却方法コード名',
+          from: '償却方法コード',
           convert: (fromValue) => {
             var value = undefined
             if (fromValue == 4) {
-                value = 2
+              value = 2
             } else if (fromValue == 7) {
-                value = 5
+              value = 5
             } else if (fromValue == 10) {
-                value = 6
+              value = 8
             } else if (fromValue == "") {
-                value = 4
+              value = 4
             }
             return value
           }
