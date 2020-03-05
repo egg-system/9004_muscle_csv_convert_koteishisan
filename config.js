@@ -238,17 +238,7 @@ module.exports = {
           name: '当期償却方法',
           from: '償却方法コード',
           convert: (fromValue) => {
-            var value = ''
-            if (fromValue == 4) {
-              value = 2
-            } else if (fromValue == 7) {
-              value = 5
-            } else if (fromValue == 10) {
-              value = 8
-            } else if (fromValue == "") {
-              value = 4
-            }
-            return value
+            return convertShoukyakuHouhou(fromValue)
           }
         },
         {
@@ -304,6 +294,10 @@ module.exports = {
         },
         {
           name: '翌期償却方法',
+          from: '償却方法コード',
+          convert: (fromValue) => {
+            return convertShoukyakuHouhou(fromValue)
+          }
         },
         {
           name: '翌期耐用年数',
@@ -492,7 +486,6 @@ module.exports = {
         },
         {
           name: '申告先コード',
-          default: '00001',
         },
         {
           name: '前年度申告時帳簿価額',
@@ -685,6 +678,13 @@ module.exports = {
         },
         {
           name: '改定年月日',
+          from: '改定取得価額',
+          convert: (fromValue) => {
+            if (fromValue == '') {
+              return ''
+            }
+            return '20190501'
+          }
         },
         {
           name: '会計期首改定取得価額',
@@ -855,4 +855,18 @@ function convertDateFormat(fromValue) {
     return ''
   }
   return date.format('YYYYMMDD')
+}
+
+function convertShoukyakuHouhou(fromValue) {
+  var value = ''
+  if (fromValue == 4) {
+    value = 2
+  } else if (fromValue == 7) {
+    value = 5
+  } else if (fromValue == 10) {
+    value = 8
+  } else if (fromValue == "") {
+    value = 4
+  }
+  return value
 }
