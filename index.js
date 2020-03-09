@@ -38,17 +38,14 @@ const convertRow = (row) => {
   })
 
   const newRow = []
-
   // 列の生成
   config.outputSettings.outputs.columns.forEach(column => {
     let value = null
 
     if ('from' in column) {
-      value = row[column.from]
-      if (value != undefined) {
-        // console.log("from' in column");
-        // console.log(value);
-      }
+      value = Array.isArray(column.from) ?
+        column.from.map((from) => { return row[from] }) :
+        row[column.from]
     }
 
     if ('convert' in column) {

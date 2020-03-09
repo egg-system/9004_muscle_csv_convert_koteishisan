@@ -1,5 +1,52 @@
 const moment = require('moment')
 
+const convertDateFormat = (fromValue) => {
+  let date = moment(fromValue, 'YYYY/MM/DD')
+  if (!date.isValid()) {
+    return ''
+  }
+  return date.format('YYYYMMDD')
+}
+
+const convertShoukyakuHouhou = (fromValue) => {
+  var value = ''
+  if (fromValue == 4) {
+    value = 2
+  } else if (fromValue == 7) {
+    value = 5
+  } else if (fromValue == 10) {
+    value = 8
+  } else if (fromValue == "") {
+    value = 4
+  }
+  return value
+}
+
+const convertAsshukugaku = (fromValue) => {
+  let asshuku = fromValue[0]
+  if (asshuku == "") {
+    return ""
+  }
+  asshuku = Number(asshuku)
+  let shutoku = Number(fromValue[1])
+  //圧縮額の方が取得額より大きれば設定しない
+  if (shutoku < asshuku) {
+    return ""
+  }
+  return asshuku
+}
+
+const convertShoukyakuShinkokuType = (fromValue) => {
+  var value = 0
+  if (fromValue == "工具、器具及び備品") {
+    value = 6
+  } else if (fromValue == "構築物") {
+    value = 1
+  } else if (fromValue == "種類未定") {
+    value = 0
+  }
+  return value
+}
 
 module.exports = {
 
@@ -112,6 +159,10 @@ module.exports = {
         },
         {
           name: '資産名略称',
+          from: '名称',
+          convert: (fromValue) => {
+            return fromValue.replace(/[　\s]+/g, ' ').substr(0, 20)
+          }
         },
         {
           name: '型式',
@@ -204,18 +255,15 @@ module.exports = {
         },
         {
           name: '圧縮区分',
-          from: '圧縮損計上',
+          from: ['圧縮損計上', '取得価額'],
           convert: (fromValue) => {
-            var value = 0
-            if (fromValue != "") {
-              value = 1
-            }
-            return value
+            return convertAsshukugaku(fromValue) == '' ? 0 : 1
           }
         },
         {
           name: '圧縮額',
-          from: '圧縮損計上',
+          from: ['圧縮損計上', '取得価額'],
+          convert: convertAsshukugaku
         },
         {
           name: '修正後取得価額',
@@ -237,9 +285,7 @@ module.exports = {
         {
           name: '当期償却方法',
           from: '償却方法コード',
-          convert: (fromValue) => {
-            return convertShoukyakuHouhou(fromValue)
-          }
+          convert: convertShoukyakuHouhou
         },
         {
           name: '当期耐用年数',
@@ -295,12 +341,11 @@ module.exports = {
         {
           name: '翌期償却方法',
           from: '償却方法コード',
-          convert: (fromValue) => {
-            return convertShoukyakuHouhou(fromValue)
-          }
+          convert: convertShoukyakuHouhou
         },
         {
           name: '翌期耐用年数',
+          from: '耐用年数', //仕様不明。大塚商会問い合わせ中
         },
         {
           name: '翌期償却率',
@@ -346,21 +391,9 @@ module.exports = {
         },
         {
           name: '除売却区分',
-          from: '処分区分',
-          convert: (fromValue) => {
-            var value = ""
-            if (fromValue == "除却") {
-              value = 1
-            }
-            return value
-          }
         },
         {
           name: '除売却年月日',
-          from: '処分年月日',
-          convert: (fromValue) => {
-            return convertDateFormat(fromValue)
-          }
         },
         {
           name: '売却額',
@@ -383,23 +416,17 @@ module.exports = {
         {
           name: '購入日',
           from: '取得年月日',
-          convert: (fromValue) => {
-            return convertDateFormat(fromValue)
-          }
+          convert: convertDateFormat
         },
         {
           name: '取得日',
           from: '取得年月日',
-          convert: (fromValue) => {
-            return convertDateFormat(fromValue)
-          }
+          convert: convertDateFormat
         },
         {
           name: '償却開始日',
           from: '使用開始日',
-          convert: (fromValue) => {
-            return convertDateFormat(fromValue)
-          }
+          convert: convertDateFormat
         },
         {
           name: '初年度償却',
@@ -472,20 +499,15 @@ module.exports = {
         {
           name: '償却資産申告種別',
           from: '償却資産申告用資産種類',
-          convert: (fromValue) => {
-            var value = 0
-            if (fromValue == "工具、器具及び備品") {
-              value = 6
-            } else if (fromValue == "構築物") {
-              value = 1
-            } else if (fromValue == "種類未定") {
-              value = 0
-            }
-            return value
-          }
+          convert: convertShoukyakuShinkokuType
         },
         {
           name: '申告先コード',
+          from: '償却資産申告用資産種類',
+          convert: (fromValue) => {
+            let shinkokuType = convertShoukyakuShinkokuType(fromValue)
+            return (shinkokuType == 0) ? "" : '0001'
+          }
         },
         {
           name: '前年度申告時帳簿価額',
@@ -524,11 +546,11 @@ module.exports = {
         },
         {
           name: '前期繰越超過額',
-          from: '前期繰越超過額',
+          default: '0',
         },
         {
           name: '前期繰越不足額',
-          from: '前期繰越不足額',
+          default: '0',
         },
         {
           name: '会計期首帳簿価額',
@@ -674,17 +696,10 @@ module.exports = {
         },
         {
           name: '改定取得価額',
-          from: '改定取得価額',
+          default: '0',
         },
         {
           name: '改定年月日',
-          from: '改定取得価額',
-          convert: (fromValue) => {
-            if (fromValue == '') {
-              return ''
-            }
-            return '20190501'
-          }
         },
         {
           name: '会計期首改定取得価額',
@@ -849,24 +864,3 @@ module.exports = {
 }
 
 
-function convertDateFormat(fromValue) {
-  let date = moment(fromValue, 'YYYY/MM/DD')
-  if (!date.isValid()) {
-    return ''
-  }
-  return date.format('YYYYMMDD')
-}
-
-function convertShoukyakuHouhou(fromValue) {
-  var value = ''
-  if (fromValue == 4) {
-    value = 2
-  } else if (fromValue == 7) {
-    value = 5
-  } else if (fromValue == 10) {
-    value = 8
-  } else if (fromValue == "") {
-    value = 4
-  }
-  return value
-}
