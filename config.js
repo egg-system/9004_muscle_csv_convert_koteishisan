@@ -36,6 +36,24 @@ const convertAsshukugaku = (fromValue) => {
   return asshuku
 }
 
+const truncateForFullChar = (fromValue, size) => {
+  var b = 0;
+  for (var i = 0;  i < fromValue.length; i++) {
+    //半角カナ
+    var reg = new RegExp(/^[ｦ-ﾟ]*$/);
+    if (reg.test(fromValue.charAt(i))) {
+      b += 1;
+    } else {
+      b += fromValue.charCodeAt(i) <= 255 ? 1 : 2;
+    }
+
+    if (b > size) {
+      return fromValue.substr(0, i)
+    }
+  }
+  return fromValue;
+}
+
 const convertShoukyakuShinkokuType = (fromValue) => {
   var value = 0
   if (fromValue == "工具、器具及び備品") {
@@ -161,7 +179,7 @@ module.exports = {
           name: '資産名略称',
           from: '名称',
           convert: (fromValue) => {
-            return fromValue.replace(/[　\s]+/g, ' ').substr(0, 20)
+            return truncateForFullChar(fromValue.replace(/[　\s]+/g, ' '), 20)
           }
         },
         {
@@ -208,7 +226,7 @@ module.exports = {
         },
         {
           name: '部門コード',
-          default: '000000',
+          default: '000021',
         },
         {
           name: '普通償却費仕訳パターン',
@@ -345,6 +363,7 @@ module.exports = {
         },
         {
           name: '翌期耐用年数',
+          from: '耐用年数',
         },
         {
           name: '翌期償却率',
