@@ -345,7 +345,6 @@ module.exports = {
         },
         {
           name: '翌期耐用年数',
-          from: '耐用年数', //仕様不明。大塚商会問い合わせ中
         },
         {
           name: '翌期償却率',
@@ -391,9 +390,19 @@ module.exports = {
         },
         {
           name: '除売却区分',
+          from: ['処分区分', '処分年月日'],
+          convert: (fromValue) => {
+            let type = fromValue[0]
+            let date = fromValue[1]
+            return (date != '' && type == "除却") ? '1' : ''
+          }
         },
         {
           name: '除売却年月日',
+          from: '処分年月日',
+          convert: (fromValue) => {
+            return convertDateFormat(fromValue)
+          }
         },
         {
           name: '売却額',
